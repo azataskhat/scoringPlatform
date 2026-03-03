@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: iot-security-db
+    environment:
+      POSTGRES_DB: iot_security
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: iot-security-backend
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: iot_security
+      DB_USER: postgres
+      DB_PASS: postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  data-collector:
+    build: ./data_collector
+    container_name: iot-security-collector
+    environment:
+      SHODAN_API_KEY: ${SHODAN_API_KEY:-}
+      CENSYS_API_ID: ${CENSYS_API_ID:-}
+      CENSYS_API_SECRET: ${CENSYS_API_SECRET:-}
+      GREYNOISE_API_KEY: ${GREYNOISE_API_KEY:-}
+      NVD_API_KEY: ${NVD_API_KEY:-}
+    depends_on:
+      - backend
+
+  frontend:
+    build: ./frontend
+    container_name: iot-security-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

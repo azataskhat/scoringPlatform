@@ -1,0 +1,41 @@
+backend:
+  url: "http://localhost:8080"
+  ingest_endpoint: "/api/ingest"
+  scoring_endpoint: "/api/scoring/run"
+
+collectors:
+  shodan:
+    enabled: true
+    api_key_env: "SHODAN_API_KEY"
+    interval_minutes: 60
+    query: "city:Almaty port:80,443,1883,8883,5683,502"
+
+  censys:
+    enabled: true
+    api_key_env: "CENSYS_API_ID"
+    api_secret_env: "CENSYS_API_SECRET"
+    interval_minutes: 120
+    query: "location.city: Almaty AND services.port: {80, 443, 1883}"
+
+  greynoise:
+    enabled: true
+    api_key_env: "GREYNOISE_API_KEY"
+    interval_minutes: 90
+    query: "city:Almaty"
+
+  nvd:
+    enabled: true
+    api_key_env: "NVD_API_KEY"
+    interval_minutes: 360
+    keywords:
+      - "IoT"
+      - "MQTT"
+      - "Modbus"
+      - "camera"
+      - "router"
+
+scoring:
+  interval_minutes: 30
+
+logging:
+  level: INFO
