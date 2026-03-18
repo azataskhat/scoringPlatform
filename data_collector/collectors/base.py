@@ -3,6 +3,7 @@
 """
 
 import logging
+import os
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from typing import Any
@@ -18,6 +19,7 @@ class BaseCollector(ABC):
     def __init__(self, source_name: str, api_key: str):
         self.source_name = source_name
         self.api_key = api_key
+        self.backend_api_key = os.environ.get("API_KEY", "")
 
     @abstractmethod
     async def collect(self, params: dict) -> list[dict]:
@@ -36,11 +38,16 @@ class BaseCollector(ABC):
             "data": data,
         }
 
+        headers = {}
+        if self.backend_api_key:
+            headers["X-API-Key"] = self.backend_api_key
+
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     f"{backend_url}/api/ingest",
                     json=payload,
+                    headers=headers,
                     timeout=aiohttp.ClientTimeout(total=30),
                 ) as resp:
                     if resp.status == 200:

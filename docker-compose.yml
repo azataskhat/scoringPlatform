@@ -3,15 +3,15 @@ services:
     image: postgis/postgis:16-3.4
     container_name: iot-security-db
     environment:
-      POSTGRES_DB: iot_security
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5433:5432"
+      POSTGRES_DB: ${DB_NAME:-iot_security}
+      POSTGRES_USER: ${DB_USER:-iot_app}
+      POSTGRES_PASSWORD: ${DB_PASS:?DB_PASS must be set in .env}
+    expose:
+      - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-iot_app}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -24,9 +24,10 @@ services:
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
-      DB_NAME: iot_security
-      DB_USER: postgres
-      DB_PASS: postgres
+      DB_NAME: ${DB_NAME:-iot_security}
+      DB_USER: ${DB_USER:-iot_app}
+      DB_PASS: ${DB_PASS:?DB_PASS must be set in .env}
+      API_KEY: ${API_KEY:?API_KEY must be set in .env}
     depends_on:
       postgres:
         condition: service_healthy
@@ -35,6 +36,8 @@ services:
     build: ./data_collector
     container_name: iot-security-collector
     environment:
+      BACKEND_URL: http://backend:8080
+      API_KEY: ${API_KEY:?API_KEY must be set in .env}
       SHODAN_API_KEY: ${SHODAN_API_KEY:-}
       CENSYS_API_ID: ${CENSYS_API_ID:-}
       CENSYS_API_SECRET: ${CENSYS_API_SECRET:-}

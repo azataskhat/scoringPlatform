@@ -4,6 +4,7 @@ Scorer — вычисление параметров r1..a2 на стороне 
 """
 
 import logging
+import os
 import time
 
 import aiohttp
@@ -17,6 +18,7 @@ class Scorer:
 
     def __init__(self, backend_url: str):
         self.backend_url = backend_url
+        self.api_key = os.environ.get("API_KEY", "")
         self._api_timings: dict[str, list[float]] = {}  # source_name -> [response_times]
 
     def record_api_timing(self, source_name: str, elapsed_seconds: float) -> None:
@@ -70,10 +72,15 @@ class Scorer:
 
     async def trigger_scoring(self) -> None:
         """Запускает пересчёт скоринга для всех источников на backend."""
+        headers = {}
+        if self.api_key:
+            headers["X-API-Key"] = self.api_key
+
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.post(
                     f"{self.backend_url}/api/scoring/run",
+                    headers=headers,
                     timeout=aiohttp.ClientTimeout(total=60),
                 ) as resp:
                     if resp.status == 200:

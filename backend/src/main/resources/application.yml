@@ -3,9 +3,9 @@ spring:
     name: iot-security-platform
 
   r2dbc:
-    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:iot_security}?sslMode=disable
-    username: ${DB_USER:postgres}
-    password: ${DB_PASS:postgres}
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:iot_security}
+    username: ${DB_USER:iot_app}
+    password: ${DB_PASS:}
     pool:
       initial-size: 2
       max-size: 10
@@ -19,8 +19,11 @@ server:
 
 logging:
   level:
-    com.osint.iotsecurity: DEBUG
+    com.osint.iotsecurity: INFO
     org.springframework.r2dbc: INFO
+
+security:
+  api-key: ${API_KEY:}
 
 scoring:
   weights:

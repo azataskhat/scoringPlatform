@@ -72,6 +72,11 @@ public class ScoringService {
      * Обновить весовые коэффициенты.
      */
     public void updateWeights(ScoringWeightsDto dto) {
+        if (dto.getReliabilityWeight() != null)  validateWeight(dto.getReliabilityWeight(), "reliability");
+        if (dto.getTimelinessWeight() != null)   validateWeight(dto.getTimelinessWeight(), "timeliness");
+        if (dto.getCompletenessWeight() != null)  validateWeight(dto.getCompletenessWeight(), "completeness");
+        if (dto.getAccessibilityWeight() != null) validateWeight(dto.getAccessibilityWeight(), "accessibility");
+
         if (dto.getReliabilityWeight() != null)  properties.getWeights().setReliability(dto.getReliabilityWeight());
         if (dto.getTimelinessWeight() != null)   properties.getWeights().setTimeliness(dto.getTimelinessWeight());
         if (dto.getCompletenessWeight() != null)  properties.getWeights().setCompleteness(dto.getCompletenessWeight());
@@ -81,6 +86,13 @@ public class ScoringService {
                 properties.getWeights().getTimeliness(),
                 properties.getWeights().getCompleteness(),
                 properties.getWeights().getAccessibility());
+    }
+
+    private void validateWeight(Double weight, String name) {
+        if (weight == null || weight.isNaN() || weight.isInfinite() || weight < 0.0 || weight > 1.0) {
+            throw new IllegalArgumentException(
+                    "Invalid weight for " + name + ": must be a number between 0.0 and 1.0");
+        }
     }
 
     public Flux<ScoringResult> getAllResults() {

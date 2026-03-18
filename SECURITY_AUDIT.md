@@ -9,10 +9,10 @@
 
 | # | Уязвимость | Где | Статус |
 |---|-----------|-----|--------|
-| 1 | **Нет аутентификации/авторизации** — все API-эндпоинты публично доступны. Любой может создавать/удалять источники, инжестить данные, запускать скоринг, читать IP-адреса устройств | Все контроллеры backend | Не исправлено |
-| 2 | **Захардкоженные credentials БД** — `postgres:postgres` + `sslMode=disable` | `docker-compose.yml`, `application.yml` | Не исправлено |
-| 3 | **Порт PostgreSQL открыт наружу** (`0.0.0.0:5433`) — с дефолтными кредами любой может подключиться к БД | `docker-compose.yml:9-10` | Не исправлено |
-| 4 | **Data Poisoning через неаутентифицированный `/api/ingest`** — можно залить фейковые устройства и уязвимости без ограничений | `IngestController.java`, `IngestService.java` | Не исправлено |
+| 1 | **Нет аутентификации/авторизации** — все API-эндпоинты публично доступны. Любой может создавать/удалять источники, инжестить данные, запускать скоринг, читать IP-адреса устройств | Все контроллеры backend | **Исправлено** — добавлен API-key фильтр (`ApiKeyAuthFilter.java`) для всех write-операций (POST/PUT/DELETE) |
+| 2 | **Захардкоженные credentials БД** — `postgres:postgres` + `sslMode=disable` | `docker-compose.yml`, `application.yml` | **Исправлено** — credentials вынесены в `.env`, `sslMode=disable` убран, дефолтный пользователь `iot_app` |
+| 3 | **Порт PostgreSQL открыт наружу** (`0.0.0.0:5433`) — с дефолтными кредами любой может подключиться к БД | `docker-compose.yml:9-10` | **Исправлено** — `ports` заменён на `expose`, БД доступна только внутри Docker-сети |
+| 4 | **Data Poisoning через неаутентифицированный `/api/ingest`** — можно залить фейковые устройства и уязвимости без ограничений | `IngestController.java`, `IngestService.java` | **Исправлено** — POST `/api/ingest` защищён API-key аутентификацией |
 
 ---
 
@@ -25,12 +25,12 @@
 | 7 | **Утечка чувствительных данных** — IP-адреса, GPS-координаты, raw scan data доступны без авторизации | `DeviceController.java`, `DeviceMap.tsx` | Не исправлено |
 | 8 | **Нулевая валидация входных данных** — нет `@Valid`, нет Bean Validation, можно отправить `null`, `NaN`, отрицательные числа | Все DTO и контроллеры | Не исправлено |
 | 9 | **Unbounded queries** — нет пагинации, эндпоинт `limit` без верхней границы -> DoS | Все list-эндпоинты, `DashboardController.java:48` | Не исправлено |
-| 10 | **Scoring weights manipulation** — веса можно выставить в `NaN`/`Infinity`/отрицательные, ломая весь скоринг | `ScoringService.java:74-84` | Не исправлено |
+| 10 | **Scoring weights manipulation** — веса можно выставить в `NaN`/`Infinity`/отрицательные, ломая весь скоринг | `ScoringService.java:74-84` | **Исправлено** — добавлена валидация: [0.0, 1.0], отклонение NaN/Infinity |
 | 11 | **Backend порт 8080 открыт напрямую**, минуя nginx | `docker-compose.yml:21-22` | Не исправлено |
 | 12 | **Нет security headers в nginx** — нет CSP, X-Frame-Options, X-Content-Type-Options, HSTS | `nginx.conf` | Не исправлено |
 | 13 | **Нет TLS/HTTPS** — весь трафик открытым текстом | `nginx.conf`, `application.yml` | Не исправлено |
 | 14 | **Docker-контейнеры запущены от root** | Все 3 Dockerfile | Не исправлено |
-| 15 | **Нет аутентификации при отправке данных на backend** из data_collector | `base.py:40-45`, `scorer.py:74-78` | Не исправлено |
+| 15 | **Нет аутентификации при отправке данных на backend** из data_collector | `base.py:40-45`, `scorer.py:74-78` | **Исправлено** — добавлен заголовок `X-API-Key` при отправке данных |
 
 ---
 
