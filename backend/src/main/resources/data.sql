@@ -9,7 +9,7 @@ ON CONFLICT (name) DO NOTHING;
 
 -- Seed IoT Devices (Almaty region demo data)
 INSERT INTO iot_devices (source_id, ip_address, port, protocol, device_type, manufacturer, firmware_version, city, latitude, longitude, raw_data)
-SELECT s.id, d.ip, d.port, d.protocol, d.device_type, d.manufacturer, d.firmware, 'Almaty', d.lat, d.lon, d.raw::jsonb
+SELECT s.id, d.ip, d.port, d.protocol, d.device_type, d.manufacturer, d.firmware, 'Almaty', d.lat, d.lon, d.raw
 FROM osint_sources s,
 (VALUES
     ('Shodan', '185.125.88.10',  1883, 'MQTT',   'sensor',  'Espressif',  '2.1.0', 43.2380, 76.9450, '{"banner":"Mosquitto MQTT"}'),
@@ -43,7 +43,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO scoring_results (source_id, reliability_score, timeliness_score, completeness_score, accessibility_score, total_score, parameters)
 SELECT s.id, sc.r, sc.t, sc.c, sc.a,
        (0.35*sc.r + 0.25*sc.t + 0.25*sc.c + 0.15*sc.a),
-       sc.params::jsonb
+       sc.params
 FROM osint_sources s,
 (VALUES
     ('Shodan',    0.85, 0.78, 0.82, 0.91, '{"r1":0.88,"r2":0.80,"r3":0.87,"t1":0.75,"t2":0.81,"c1":0.85,"c2":0.78,"c3":0.83,"a1":0.95,"a2":0.87}'),

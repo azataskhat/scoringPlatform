@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS iot_devices (
     city              VARCHAR(255) DEFAULT 'Almaty',
     latitude          DOUBLE PRECISION,
     longitude         DOUBLE PRECISION,
-    raw_data          JSONB,
+    raw_data          TEXT,
     discovered_at     TIMESTAMP DEFAULT NOW()
 );
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS scoring_results (
     completeness_score  DOUBLE PRECISION,
     accessibility_score DOUBLE PRECISION,
     total_score         DOUBLE PRECISION,
-    parameters          JSONB,
+    parameters          TEXT,
     calculated_at       TIMESTAMP DEFAULT NOW()
 );
 

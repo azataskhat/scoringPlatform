@@ -28,51 +28,62 @@
 | Frontend | React 18, TypeScript, Recharts, Leaflet, Tailwind CSS |
 | Database | PostgreSQL 16 + PostGIS 3.4 |
 
+## Требования
+
+- Docker и Docker Compose
+
 ## Быстрый старт
 
-### 1. Клонирование и настройка
+### 1. Настройка переменных окружения
 
-```bash
-cp .env.example .env
-# Заполните .env: пароль БД, API-ключ аутентификации и ключи OSINT-сервисов
+Отредактируйте файл `.env` в корне проекта — укажите пароль БД, API-ключ и ключи OSINT-сервисов:
+
+```env
+DB_PASS=<пароль_базы_данных>
+API_KEY=<ключ_для_внутренней_аутентификации>
+SHODAN_API_KEY=<ваш_ключ>
+CENSYS_API_ID=<ваш_id>
+CENSYS_API_SECRET=<ваш_secret>
+GREYNOISE_API_KEY=<ваш_ключ>
+NVD_API_KEY=<ваш_ключ>
 ```
 
-### 2. Запуск через Docker Compose
+### 2. Сборка и запуск
 
 ```bash
 docker compose up -d
 ```
 
-Сервисы будут доступны:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8080
-- PostgreSQL: localhost:5432
+### 3. Инициализация базы данных (один раз при первом запуске)
 
-### 3. Локальная разработка
-
-**PostgreSQL:**
 ```bash
-docker compose up -d postgres
+docker compose exec -T postgres psql -U iot_app -d iot_security < backend/src/main/resources/schema.sql
+docker compose exec -T postgres psql -U iot_app -d iot_security < backend/src/main/resources/data.sql
 ```
 
-**Backend:**
+### 4. Открыть в браузере
+
+- **http://localhost:3000** — веб-интерфейс (дашборд, карта устройств, скоринг)
+
+### Остановка
+
 ```bash
-cd backend
-./mvnw spring-boot:run
+docker compose down          # остановить (данные БД сохраняются)
+docker compose down -v       # остановить и удалить данные БД
 ```
 
-**Data Collector:**
+### Логи
+
 ```bash
-cd data_collector
-pip install -r requirements.txt
-python main.py
+docker compose logs -f                 # все сервисы
+docker compose logs -f backend         # только backend
+docker compose logs -f data-collector  # только collector
 ```
 
-**Frontend:**
+### Пересборка после изменений в коде
+
 ```bash
-cd frontend
-npm install
-npm run dev
+docker compose up -d --build
 ```
 
 ## API Endpoints
