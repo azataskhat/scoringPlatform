@@ -100,7 +100,7 @@ public class ScoringService {
     }
 
     public Flux<ScoringResult> getResultsBySource(Long sourceId) {
-        return scoringResultRepository.findBySourceId(sourceId);
+        return scoringResultRepository.findBySourceIdOrdered(sourceId);
     }
 
     public Flux<ScoringResult> getResultsByPeriod(LocalDateTime from, LocalDateTime to) {

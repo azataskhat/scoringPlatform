@@ -2,6 +2,10 @@ spring:
   application:
     name: iot-security-platform
 
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
   r2dbc:
     url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5433}/${DB_NAME:iot_security}
     username: ${DB_USER:iot_app}

@@ -40,17 +40,17 @@ WHERE dev.ip_address = v.ip
 ON CONFLICT DO NOTHING;
 
 -- Seed Scoring Results
-INSERT INTO scoring_results (source_id, reliability_score, timeliness_score, completeness_score, accessibility_score, total_score, parameters)
+INSERT INTO scoring_results (source_id, reliability_score, timeliness_score, completeness_score, accessibility_score, total_score, parameters, calculated_at)
 SELECT s.id, sc.r, sc.t, sc.c, sc.a,
        (0.35*sc.r + 0.25*sc.t + 0.25*sc.c + 0.15*sc.a),
-       sc.params
+       sc.params, sc.ts
 FROM osint_sources s,
 (VALUES
-    ('Shodan',    0.85, 0.78, 0.82, 0.91, '{"r1":0.88,"r2":0.80,"r3":0.87,"t1":0.75,"t2":0.81,"c1":0.85,"c2":0.78,"c3":0.83,"a1":0.95,"a2":0.87}'),
-    ('Censys',    0.82, 0.72, 0.88, 0.85, '{"r1":0.84,"r2":0.78,"r3":0.84,"t1":0.70,"t2":0.74,"c1":0.90,"c2":0.85,"c3":0.89,"a1":0.88,"a2":0.82}'),
-    ('GreyNoise', 0.75, 0.90, 0.65, 0.88, '{"r1":0.78,"r2":0.70,"r3":0.77,"t1":0.92,"t2":0.88,"c1":0.68,"c2":0.60,"c3":0.67,"a1":0.90,"a2":0.86}'),
-    ('NVD',       0.95, 0.60, 0.92, 0.95, '{"r1":0.97,"r2":0.92,"r3":0.96,"t1":0.55,"t2":0.65,"c1":0.94,"c2":0.90,"c3":0.92,"a1":0.98,"a2":0.92}')
-) AS sc(src, r, t, c, a, params)
+    ('Shodan',    0.85, 0.78, 0.82, 0.91, '{"r1":0.88,"r2":0.80,"r3":0.87,"t1":0.75,"t2":0.81,"c1":0.85,"c2":0.78,"c3":0.83,"a1":0.95,"a2":0.87}', NOW() - INTERVAL '3 days'),
+    ('Censys',    0.82, 0.72, 0.88, 0.85, '{"r1":0.84,"r2":0.78,"r3":0.84,"t1":0.70,"t2":0.74,"c1":0.90,"c2":0.85,"c3":0.89,"a1":0.88,"a2":0.82}', NOW() - INTERVAL '2 days'),
+    ('GreyNoise', 0.75, 0.90, 0.65, 0.88, '{"r1":0.78,"r2":0.70,"r3":0.77,"t1":0.92,"t2":0.88,"c1":0.68,"c2":0.60,"c3":0.67,"a1":0.90,"a2":0.86}', NOW() - INTERVAL '1 day'),
+    ('NVD',       0.95, 0.60, 0.92, 0.95, '{"r1":0.97,"r2":0.92,"r3":0.96,"t1":0.55,"t2":0.65,"c1":0.94,"c2":0.90,"c3":0.92,"a1":0.98,"a2":0.92}', NOW())
+) AS sc(src, r, t, c, a, params, ts)
 WHERE s.name = sc.src
 ON CONFLICT DO NOTHING;
 

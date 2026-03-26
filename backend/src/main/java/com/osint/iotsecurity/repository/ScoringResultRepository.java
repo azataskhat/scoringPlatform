@@ -13,6 +13,9 @@ public interface ScoringResultRepository extends ReactiveCrudRepository<ScoringR
     @Query("SELECT * FROM scoring_results ORDER BY calculated_at DESC")
     Flux<ScoringResult> findAllOrderByCalculatedAtDesc();
 
+    @Query("SELECT * FROM scoring_results WHERE source_id = :sourceId ORDER BY calculated_at ASC")
+    Flux<ScoringResult> findBySourceIdOrdered(Long sourceId);
+
     @Query("SELECT * FROM scoring_results WHERE source_id = :sourceId ORDER BY calculated_at DESC LIMIT 1")
     Mono<ScoringResult> findLatestBySourceId(Long sourceId);
 

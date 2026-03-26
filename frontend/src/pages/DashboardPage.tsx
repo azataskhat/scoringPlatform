@@ -4,6 +4,7 @@ import { useSSE } from "../hooks/useSSE";
 import type { DashboardStats, ScoringResult, SecurityEvent } from "../types";
 import StatsCards from "../components/Dashboard/StatsCards";
 import ScoreTrend from "../components/Dashboard/ScoreTrend";
+import { formatDateTime } from "../utils/dateFormat";
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -60,7 +61,7 @@ export default function DashboardPage() {
                 <span className="text-sm text-gray-300">{event.description}</span>
               </div>
               <span className="text-xs text-gray-500">
-                {event.eventTime ? new Date(event.eventTime).toLocaleString("ru-RU") : ""}
+                {event.eventTime ? formatDateTime(event.eventTime) : ""}
               </span>
             </div>
           ))}

@@ -18,7 +18,7 @@ export default function SourceDetail() {
 
   if (!source) return <div className="text-gray-400">Loading...</div>;
 
-  const latest = scores[0];
+  const latest = scores.length > 0 ? scores[scores.length - 1] : undefined;
   const radarData: RadarDataPoint[] = latest
     ? [
         { dimension: "Reliability (R)", value: latest.reliabilityScore, fullMark: 1 },

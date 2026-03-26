@@ -36,9 +36,11 @@ export default function ReportForm() {
     setLoading(true);
     setError("");
     try {
+      const toEnd = new Date(to);
+      toEnd.setHours(23, 59, 59, 999);
       const data = await generateReport(
         new Date(from).toISOString(),
-        new Date(to).toISOString()
+        toEnd.toISOString()
       );
       setReport(data);
     } catch {

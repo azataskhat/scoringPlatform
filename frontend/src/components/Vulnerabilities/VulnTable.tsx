@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getVulnerabilities } from "../../services/api";
 import type { Vulnerability } from "../../types";
+import { formatDate } from "../../utils/dateFormat";
 
 const SEVERITY_STYLES: Record<string, string> = {
   CRITICAL: "bg-red-500/20 text-red-400",
@@ -61,7 +62,7 @@ export default function VulnTable() {
                 </td>
                 <td className="p-4 text-gray-300 max-w-md truncate">{v.description}</td>
                 <td className="p-4 text-center text-gray-400 text-xs">
-                  {v.detectedAt ? new Date(v.detectedAt).toLocaleDateString("ru-RU") : "—"}
+                  {formatDate(v.detectedAt)}
                 </td>
               </tr>
             ))}

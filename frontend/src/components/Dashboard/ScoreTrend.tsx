@@ -3,14 +3,20 @@ import {
   Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
 import type { ScoringResult } from "../../types";
+import { formatDate, toTimestamp } from "../../utils/dateFormat";
 
 interface Props {
   results: ScoringResult[];
 }
 
 export default function ScoreTrend({ results }: Props) {
-  const chartData = results.map((r) => ({
-    date: new Date(r.calculatedAt).toLocaleDateString("ru-RU"),
+  // Sort by date ASC for chart display (oldest → newest, left → right)
+  const sorted = [...results].sort(
+    (a, b) => toTimestamp(a.calculatedAt) - toTimestamp(b.calculatedAt)
+  );
+
+  const chartData = sorted.map((r) => ({
+    date: formatDate(r.calculatedAt),
     sourceId: r.sourceId,
     total: +(r.totalScore?.toFixed(3) ?? 0),
     reliability: +(r.reliabilityScore?.toFixed(3) ?? 0),
